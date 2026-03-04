@@ -162,4 +162,5 @@ body{font-family:-apple-system,BlinkMacSystemFont,Segoe UI,Roboto,sans-serif;bac
 .coach-table .coach-delete-cell button:hover{opacity:1}
 .coach-fab{position:fixed;bottom:1.25rem;left:1.25rem;width:48px;height:48px;border-radius:50%;background:var(--surface);border:1px solid rgba(255,255,255,.12);color:var(--text-dim);font-size:1.3rem;cursor:pointer;z-index:200;display:flex;align-items:center;justify-content:center;transition:all .2s;box-shadow:0 4px 12px rgba(0,0,0,.3);opacity:.6}
 .coach-fab:hover{opacity:1;background:var(--blue);color:#fff;transform:scale(1.1)}
+.site-footer{position:fixed;bottom:0;right:0;left:0;text-align:center;padding:.5rem;font-size:.75rem;color:var(--text-dim);opacity:.5;pointer-events:none;z-index:50}
 @media(max-width:600px){.game-title{font-size:1.8rem}.game-header{padding:.5rem .75rem}.player-name-display{display:none}.court-map{grid-template-columns:repeat(2,1fr)}.station-circle{width:60px;height:60px;font-size:1.3rem}.challenge-card{padding:1.25rem}.complete-card,.finale-card{padding:1.5rem 1.25rem}.total-number{font-size:2.5rem}.coach-table th,.coach-table td{padding:.5rem .6rem;font-size:.8rem}}

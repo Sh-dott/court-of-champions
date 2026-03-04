@@ -67,8 +67,29 @@ homeTask:"כתבו נאום מוטיבציה קצר (3-5 משפטים) לקבו�
 var RANKS=[{min:0,name:"טירון",icon:"\uD83C\uDFC0"},{min:31,name:"כוכב עולה",icon:"\u2B50"},{min:61,name:"אול-סטאר",icon:"\uD83D\uDD25"},{min:101,name:"שחקן מצטיין",icon:"\uD83C\uDFC6"},{min:141,name:"אלוף",icon:"\uD83D\uDC51"}];
 var COACH_PASSWORD="0704";
 
-/* ── Multi-player storage ── */
-function playerKey(name,jersey){return "coc_"+name.trim().toLowerCase()+"_"+jersey}
+/* ── Multi-player storage (local + server sync) ── */
+function serverKey(name,jersey){return name.trim().toLowerCase()+"_"+jersey}
+function playerKey(name,jersey){return "coc_"+serverKey(name,jersey)}
+
+function syncToServer(playerState){
+    if(!playerState||!playerState.playerName||playerState.jerseyNumber===null)return;
+    var key=serverKey(playerState.playerName,playerState.jerseyNumber);
+    fetch("/api/sync",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({key:key,data:playerState})}).catch(function(){});
+}
+function deleteFromServer(name,jersey){
+    var key=serverKey(name,jersey);
+    fetch("/api/player/"+encodeURIComponent(key),{method:"DELETE"}).catch(function(){});
+}
+function fetchPlayersFromServer(callback){
+    fetch("/api/players").then(function(r){return r.json()}).then(function(players){callback(players)}).catch(function(){
+        /* fallback to localStorage */
+        var reg=getRegistry();
+        var players=[];
+        reg.forEach(function(p){var s=loadPlayerState(p.name,p.jersey);if(s&&s.started)players.push(s)});
+        callback(players);
+    });
+}
+
 function getRegistry(){try{var r=localStorage.getItem("coc_registry");if(r)return JSON.parse(r)}catch(e){}return []}
 function setRegistry(arr){localStorage.setItem("coc_registry",JSON.stringify(arr))}
 function registerPlayer(name,jersey){
@@ -81,10 +102,10 @@ function deletePlayer(name,jersey){
     localStorage.removeItem(key);
     var reg=getRegistry().filter(function(p){return !(p.name===name&&p.jersey===jersey)});
     setRegistry(reg);
+    deleteFromServer(name,jersey);
 }
 function defaultState(){return{playerName:"",jerseyNumber:null,totalPoints:0,currentWeek:1,weekResults:{},taskResponses:{},started:false}}
 function loadState(){
-    /* legacy migration */
     try{
         var legacy=localStorage.getItem("courtOfChampions");
         if(legacy){
@@ -95,12 +116,12 @@ function loadState(){
                 registerPlayer(s.playerName,s.jerseyNumber);
                 localStorage.setItem("coc_last_player",JSON.stringify({name:s.playerName,jersey:s.jerseyNumber}));
                 localStorage.removeItem("courtOfChampions");
+                syncToServer(s);
                 return s;
             }
             localStorage.removeItem("courtOfChampions");
         }
     }catch(e){}
-    /* auto-resume last player */
     try{
         var last=localStorage.getItem("coc_last_player");
         if(last){
@@ -121,6 +142,7 @@ function saveState(){
     localStorage.setItem(key,JSON.stringify(state));
     registerPlayer(state.playerName,state.jerseyNumber);
     localStorage.setItem("coc_last_player",JSON.stringify({name:state.playerName,jersey:state.jerseyNumber}));
+    syncToServer(state);
 }
 function getRank(pts){var rank=RANKS[0];for(var i=0;i<RANKS.length;i++){if(pts>=RANKS[i].min)rank=RANKS[i]}return rank}
 function showScreen(id){document.querySelectorAll(".screen").forEach(function(s){s.classList.remove("active")});document.getElementById("screen-"+id).classList.add("active");window.scrollTo(0,0)}
@@ -493,14 +515,15 @@ function attemptCoachLogin(){
     }
 }
 function renderCoachDashboard(){
-    var reg=getRegistry();
-    var players=[];
-    reg.forEach(function(p){
-        var s=loadPlayerState(p.name,p.jersey);
-        if(s&&s.started)players.push(s);
-    });
+    /* show loading state */
+    var summaryEl=document.getElementById("coach-summary");
+    summaryEl.innerHTML='<p style="color:var(--text-dim);text-align:center">\u05D8\u05D5\u05E2\u05DF...</p>';
+    document.getElementById("coach-table-body").innerHTML="";
+    /* fetch from server, fallback to localStorage */
+    fetchPlayersFromServer(function(players){renderCoachTable(players)});
+}
+function renderCoachTable(players){
     players.sort(function(a,b){return b.totalPoints-a.totalPoints});
-    /* summary */
     var summaryEl=document.getElementById("coach-summary");
     summaryEl.innerHTML="";
     var totalPlayers=players.length;
