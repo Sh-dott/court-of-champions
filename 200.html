@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>מגרש האלופים - הרפתקת ערכים בכדורסל</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="screen-welcome" class="screen active">
+        <div class="welcome-container">
+            <div class="ball-bounce">&#127936;</div>
+            <h1 class="game-title">מגרש האלופים</h1>
+            <p class="game-subtitle">הרפתקת ערכים בכדורסל</p>
+            <div class="welcome-card">
+                <p class="welcome-desc">עלו למגרש והוכיחו שיש לכם את מה שצריך &mdash; לא רק כישרון, אלא גם <strong>לב</strong>. התמודדו עם מצבים אמיתיים, קבלו החלטות קשות, והפכו לאלופים אמיתיים!</p>
+                <div class="form-group">
+                    <label for="player-name">שם השחקן שלך</label>
+                    <input type="text" id="player-name" placeholder="הכניסו את השם שלכם..." maxlength="20" autocomplete="off">
+                </div>
+                <div class="form-group">
+                    <label for="jersey-number">מספר החולצה שלכם</label>
+                    <input type="number" id="jersey-number" min="0" max="99" placeholder="0-99" autocomplete="off">
+                </div>
+                <button class="btn btn-primary btn-large" id="btn-start" disabled>בואו נשחק!</button>
+            </div>
+            <p class="ages-note">לשחקני כדורסל בגילאי 10&ndash;12</p>
+            <button class="btn btn-ghost btn-small coach-entry-btn" id="btn-coach-entry">כניסת מאמן</button>
+        </div>
+    </div>
+    <div id="screen-court" class="screen">
+        <header class="game-header">
+            <div class="header-left">
+                <span class="player-badge" id="header-jersey"></span>
+                <span class="player-name-display" id="header-name"></span>
+            </div>
+            <div class="header-center"><span class="rank-badge" id="header-rank">טירון</span></div>
+            <div class="header-right">
+                <span class="points-display" id="header-points">0 נק.</span>
+                <button class="btn btn-small btn-ghost" id="btn-profile">הנתונים שלי</button>
+            </div>
+        </header>
+        <div class="court-container">
+            <h2 class="court-title">המסע שלך</h2>
+            <div class="court-map" id="court-map"></div>
+            <div class="court-legend">
+                <span class="legend-item"><span class="legend-dot completed"></span> הושלם</span>
+                <span class="legend-item"><span class="legend-dot current"></span> נוכחי</span>
+                <span class="legend-item"><span class="legend-dot locked"></span> נעול</span>
+            </div>
+        </div>
+    </div>
+    <div id="screen-challenge" class="screen">
+        <header class="game-header">
+            <button class="btn btn-small btn-ghost" id="btn-back-court">&rarr; חזרה</button>
+            <div class="header-center"><span class="week-indicator" id="challenge-week">שלב 1</span></div>
+            <div class="header-right"><span class="points-display" id="challenge-points">0 נק.</span></div>
+        </header>
+        <div class="challenge-container">
+            <div class="challenge-card">
+                <div class="challenge-badge" id="challenge-badge"></div>
+                <h2 class="challenge-title" id="challenge-title"></h2>
+                <div class="challenge-value" id="challenge-value"></div>
+                <div class="scenario-box">
+                    <div class="scenario-icon">&#128203;</div>
+                    <p class="scenario-text" id="scenario-text"></p>
+                </div>
+                <div class="options-container" id="options-container"></div>
+                <div class="feedback-box hidden" id="feedback-box">
+                    <div class="feedback-icon" id="feedback-icon"></div>
+                    <p class="feedback-text" id="feedback-text"></p>
+                    <div class="feedback-points" id="feedback-points"></div>
+                    <button class="btn btn-primary" id="btn-next-step">המשך &larr;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="screen-quiz" class="screen">
+        <header class="game-header">
+            <div class="header-left"><span class="week-indicator" id="quiz-week">שלב 1</span></div>
+            <div class="header-center"><span class="step-indicator">שאלת בונוס</span></div>
+            <div class="header-right"><span class="points-display" id="quiz-points">0 נק.</span></div>
+        </header>
+        <div class="challenge-container">
+            <div class="challenge-card">
+                <div class="quiz-header"><span class="quiz-star">&#11088;</span><h2>נקודות בונוס!</h2></div>
+                <p class="quiz-question" id="quiz-question"></p>
+                <div class="options-container" id="quiz-options"></div>
+                <div class="feedback-box hidden" id="quiz-feedback-box">
+                    <div class="feedback-icon" id="quiz-feedback-icon"></div>
+                    <p class="feedback-text" id="quiz-feedback-text"></p>
+                    <div class="feedback-points" id="quiz-feedback-points"></div>
+                    <button class="btn btn-primary" id="btn-next-task">המשך למשימת הבית &larr;</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="screen-task" class="screen">
+        <header class="game-header">
+            <div class="header-left"><span class="week-indicator" id="task-week">שלב 1</span></div>
+            <div class="header-center"><span class="step-indicator">משימת בית</span></div>
+            <div class="header-right"><span class="points-display" id="task-points">0 נק.</span></div>
+        </header>
+        <div class="challenge-container">
+            <div class="challenge-card">
+                <div class="task-header"><span class="task-icon">&#127968;</span><h2>משימה</h2>
+                    <p class="task-subtitle">השלימו את המשימה לקבלת נקודות בונוס!</p></div>
+                <div class="task-box"><p class="task-description" id="task-description"></p></div>
+                <div class="task-input-area">
+                    <label for="task-response">כתבו את התגובה שלכם כדי לקבל נקודות:</label>
+                    <textarea id="task-response" rows="4" placeholder="כתבו את התגובה שלכם כאן..."></textarea>
+                </div>
+                <div class="task-actions">
+                    <button class="btn btn-primary" id="btn-complete-task">&#10003; שליחה (+5 נק.)</button>
+                    <button class="btn btn-ghost" id="btn-skip-task">דלג לעת עתה</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="screen-week-complete" class="screen">
+        <div class="complete-container">
+            <div id="confetti-container"></div>
+            <div class="complete-card">
+                <div class="trophy-animation">&#127942;</div>
+                <h2>השלב הושלם!</h2>
+                <div class="week-summary" id="week-summary"></div>
+                <div class="total-score">
+                    <span class="total-label">ציון כולל</span>
+                    <span class="total-number" id="complete-total">0</span>
+                    <span class="total-label">נקודות</span>
+                </div>
+                <div class="rank-update" id="rank-update"></div>
+                <button class="btn btn-primary btn-large" id="btn-back-to-court">חזרה למגרש &larr;</button>
+            </div>
+        </div>
+    </div>
+    <div id="screen-profile" class="screen">
+        <header class="game-header">
+            <button class="btn btn-small btn-ghost" id="btn-profile-back">&rarr; חזרה</button>
+            <div class="header-center"><span class="step-indicator">הנתונים שלי</span></div>
+            <div class="header-right"></div>
+        </header>
+        <div class="profile-container">
+            <div class="profile-header-card">
+                <div class="profile-avatar" id="profile-avatar"></div>
+                <h2 id="profile-name"></h2>
+                <div class="profile-rank" id="profile-rank"></div>
+                <div class="profile-points-big" id="profile-points-big">0 נק.</div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card"><span class="stat-number" id="stat-weeks">0</span><span class="stat-label">שלבים</span></div>
+                <div class="stat-card"><span class="stat-number" id="stat-scenarios">0</span><span class="stat-label">בחירות מצוינות</span></div>
+                <div class="stat-card"><span class="stat-number" id="stat-quizzes">0</span><span class="stat-label">חידונים נכונים</span></div>
+                <div class="stat-card"><span class="stat-number" id="stat-tasks">0</span><span class="stat-label">משימות</span></div>
+            </div>
+            <div class="badges-section"><h3>ערכים שנצברו</h3><div class="badges-grid" id="badges-grid"></div></div>
+            <div class="progress-section">
+                <h3>התקדמות</h3>
+                <div class="progress-bar-container"><div class="progress-bar" id="profile-progress"></div></div>
+                <p class="progress-text" id="progress-text">0 / 160 נקודות</p>
+            </div>
+            <div class="home-tasks-section"><h3>התגובות שלי</h3><div id="saved-responses"></div></div>
+            <button class="btn btn-danger btn-small" id="btn-reset" style="margin-top:2rem">איפוס המשחק</button>
+        </div>
+    </div>
+    <div id="screen-finale" class="screen">
+        <div class="finale-container">
+            <div id="finale-confetti"></div>
+            <div class="finale-card">
+                <div class="crown-animation">&#128081;</div>
+                <h1>אלוף!</h1>
+                <p class="finale-text">השלמת את כל 8 השלבים של מגרש האלופים!</p>
+                <div class="finale-score" id="finale-score"></div>
+                <div class="finale-rank" id="finale-rank"></div>
+                <p class="finale-message">הוכחת שלהיות אלוף אמיתי זה לא רק לקלוע נקודות &mdash; זה <strong>כבוד</strong>, <strong>עבודת צוות</strong>, <strong>שליטה עצמית</strong> ו<strong>מנהיגות</strong>.</p>
+                <p class="finale-message">קחו את הערכים האלה איתכם בתוך המגרש ומחוצה לו!</p>
+                <div class="finale-actions">
+                    <button class="btn btn-primary btn-large" id="btn-view-stats">צפייה בנתונים שלי</button>
+                    <button class="btn btn-ghost" id="btn-play-again">שחק שוב</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="screen-coach" class="screen">
+        <header class="game-header">
+            <button class="btn btn-small btn-ghost" id="btn-coach-back">&rarr; חזרה</button>
+            <div class="header-center"><span class="step-indicator">לוח מאמן</span></div>
+            <div class="header-right"></div>
+        </header>
+        <div class="coach-container">
+            <div class="coach-login" id="coach-login">
+                <div class="coach-lock-icon">&#128274;</div>
+                <h2>כניסת מאמן</h2>
+                <p class="coach-login-desc">הזינו את הסיסמה כדי לצפות בנתוני השחקנים</p>
+                <input type="password" id="coach-password" placeholder="סיסמה" autocomplete="off">
+                <button class="btn btn-primary" id="btn-coach-login">כניסה</button>
+                <p class="coach-error hidden" id="coach-error">סיסמה שגויה</p>
+            </div>
+            <div class="coach-dashboard hidden" id="coach-dashboard">
+                <h2 class="coach-title">נתוני שחקנים</h2>
+                <div class="coach-summary" id="coach-summary"></div>
+                <div class="coach-table-wrap">
+                    <table class="coach-table" id="coach-table">
+                        <thead>
+                            <tr>
+                                <th>שחקן</th>
+                                <th>מספר</th>
+                                <th>שלבים</th>
+                                <th>נקודות</th>
+                                <th>דירוג</th>
+                            </tr>
+                        </thead>
+                        <tbody id="coach-table-body"></tbody>
+                    </table>
+                </div>
+                <div class="coach-detail hidden" id="coach-detail">
+                    <button class="btn btn-ghost btn-small" id="btn-detail-back">&rarr; חזרה לרשימה</button>
+                    <div id="coach-detail-content"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="coach-fab" id="coach-fab" title="כניסת מאמן">&#128203;</button>
+    <script src="game.js"></script>
+</body>
+</html>
